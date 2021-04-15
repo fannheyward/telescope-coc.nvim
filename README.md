@@ -28,6 +28,7 @@ require('telescope').load_extension('coc')
 - `document_symbols`
 - `workspace_symbols`
 - `workspace_diagnostics`
+- `commands`
 
 ## License
 
