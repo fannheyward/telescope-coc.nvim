@@ -327,6 +327,51 @@ local workspace_diagnostics = function(opts)
   diagnostics(opts)
 end
 
+local commands = function(opts)
+	if not is_ready() then
+		return
+	end
+
+	local cmds = vim.call("CocAction", "commands")
+
+	if type(cmds) ~= "table" or vim.tbl_isempty(cmds) then
+		print("No commands available")
+		return
+	end
+
+	for _, cmd in ipairs(cmds) do
+		if cmd.title == "" then
+			cmd.format = cmd.id
+		else
+			cmd.format = cmd.id .. "\t=> " .. cmd.title
+		end
+	end
+
+	pickers.new(opts, {
+		prompt_title = "Coc Commands",
+		sorter = conf.generic_sorter(opts),
+		finder = finders.new_table({
+			results = cmds,
+			entry_maker = function(line)
+				return {
+					valid = line ~= nil,
+					value = line,
+					ordinal = line.format,
+					display = line.format,
+				}
+			end,
+		}),
+		attach_mappings = function(prompt_bufnr)
+			actions.select_default:replace(function()
+				local selection = action_state.get_selected_entry()
+				actions.close(prompt_bufnr)
+				vim.call("CocActionAsync", "runCommand", selection.value.id)
+			end)
+			return true
+		end,
+	}):find()
+end
+
 return require('telescope').register_extension{
   exports = {
     links = links,
@@ -339,5 +384,6 @@ return require('telescope').register_extension{
     document_symbols = document_symbols,
     workspace_symbols = workspace_symbols,
     workspace_diagnostics = workspace_diagnostics,
+		commands = commands,
   },
 }
