@@ -9,6 +9,8 @@ local async = require('plenary.async_lib').async
 local string = string
 ---@diagnostic disable-next-line: undefined-global
 local vim = vim
+---@diagnostic disable-next-line: undefined-global
+local jit = jit
 
 ---@diagnostic disable-next-line: unused-local, unused-function
 local function logger(val)
@@ -83,10 +85,10 @@ local links = function(opts)
     attach_mappings = function(prompt_bufnr)
       actions.select_default:replace(function()
         actions.close(prompt_bufnr)
-        -- TODO, don't work
         local text = action_state.get_selected_entry().value.text
         if text:find('https?://') then
-          vim.call('coc#util#open_url', text)
+          local opener = (jit.os == 'OSX' and 'open') or 'xdg-open'
+          os.execute(opener .. ' ' .. text)
         end
       end)
 
