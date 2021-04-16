@@ -339,7 +339,7 @@ local commands = function(opts)
   end
 
   for _, cmd in ipairs(cmds) do
-      cmd.label = string.format("%s %s %s", cmd.id, string.rep(" ", 40-#cmd.id), cmd.title or ''):gsub(' $', '')
+    cmd.label = string.format("%s %s %s", cmd.id, string.rep(" ", 40-#cmd.id), cmd.title or ''):gsub(' $', '')
   end
 
   pickers.new(opts, {
