@@ -95,7 +95,7 @@ local links = function(opts)
   }):find()
 end
 
-local code_actions = function(opts, mode)
+local handle_code_actions = function(opts, mode)
   if not is_ready('codeAction') then
     return
   end
@@ -138,15 +138,15 @@ end
 -- TODO
 -- range code action
 local cursor_code_actions = function(opts)
-  code_actions(opts, 'cursor')
+  handle_code_actions(opts, 'cursor')
 end
 
 local line_code_actions = function(opts)
-  code_actions(opts, 'line')
+  handle_code_actions(opts, 'line')
 end
 
 local file_code_actions = function(opts)
-  code_actions(opts, nil)
+  handle_code_actions(opts, nil)
 end
 
 local definitions = function(opts)
@@ -374,7 +374,7 @@ return require('telescope').register_extension{
     -- references = references, -- disabled by now, needs coc update
     -- definitions = definitions,
     diagnostics = diagnostics,
-    cursor_code_actions = cursor_code_actions,
+    code_actions = cursor_code_actions,
     line_code_actions = line_code_actions,
     file_code_actions = file_code_actions,
     document_symbols = document_symbols,
