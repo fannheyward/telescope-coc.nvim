@@ -339,11 +339,7 @@ local commands = function(opts)
   end
 
   for _, cmd in ipairs(cmds) do
-    if cmd.title == "" then
-      cmd.format = cmd.id
-    else
-      cmd.format = cmd.id .. "\t=> " .. cmd.title
-    end
+      cmd.label = string.format("%s %s %s", cmd.id, string.rep(" ", 40-#cmd.id), cmd.title or ''):gsub(' $', '')
   end
 
   pickers.new(opts, {
@@ -355,8 +351,8 @@ local commands = function(opts)
         return {
           valid = line ~= nil,
           value = line,
-          ordinal = line.format,
-          display = line.format,
+          ordinal = line.label,
+          display = line.label,
         }
       end,
     }),
