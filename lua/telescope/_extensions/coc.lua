@@ -373,8 +373,8 @@ return require('telescope').register_extension{
   exports = {
     links = links,
     commands = commands,
-    -- references = references, -- disabled by now, needs coc update
-    -- definitions = definitions,
+    references = references,
+    definitions = definitions,
     diagnostics = diagnostics,
     code_actions = cursor_code_actions,
     line_code_actions = line_code_actions,
