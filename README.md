@@ -19,6 +19,7 @@ require('telescope').load_extension('coc')
 
 `:Telescope coc X`
 
+- `mru`
 - `links`
 - `commands`
 - `references`

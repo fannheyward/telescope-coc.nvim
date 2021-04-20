@@ -1,6 +1,7 @@
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local themes = require('telescope.themes')
+local path = require('telescope.path')
 local conf = require('telescope.config').values
 local finders = require('telescope.finders')
 local make_entry = require('telescope.make_entry')
@@ -55,6 +56,35 @@ local locations_to_items = function(locations)
   end
 
   return items
+end
+
+local mru = function(opts)
+  if not is_ready() then
+    return
+  end
+
+  local home = vim.call('coc#util#get_data_home')
+  local data = path.read_file(home .. path.separator .. 'mru')
+  if not data or #data == 0 then
+    return
+  end
+
+  local results = utils.max_split(data, '\n')
+  pickers.new(opts, {
+    prompt_title = 'Coc MRU',
+    sorter = conf.generic_sorter(opts),
+    finder = finders.new_table {
+      results = results,
+      entry_maker = function(line)
+        return {
+          valid = line ~= nil,
+          value = line,
+          ordinal = line,
+          display = line,
+        }
+      end
+    },
+  }):find()
 end
 
 local links = function(opts)
@@ -373,6 +403,7 @@ end
 
 return require('telescope').register_extension{
   exports = {
+    mru = mru,
     links = links,
     commands = commands,
     references = references,
