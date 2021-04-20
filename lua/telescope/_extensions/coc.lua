@@ -73,6 +73,7 @@ local mru = function(opts)
   pickers.new(opts, {
     prompt_title = 'Coc MRU',
     sorter = conf.generic_sorter(opts),
+    previewer = conf.qflist_previewer(opts),
     finder = finders.new_table {
       results = results,
       entry_maker = function(line)
