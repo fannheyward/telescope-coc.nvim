@@ -1,5 +1,6 @@
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
+local themes = require('telescope.themes')
 local conf = require('telescope.config').values
 local finders = require('telescope.finders')
 local make_entry = require('telescope.make_entry')
@@ -111,7 +112,8 @@ local handle_code_actions = function(opts, mode)
     x.idx = i
   end
 
-  pickers.new(opts, {
+  local center_list = themes.get_dropdown()
+  pickers.new(center_list, {
     prompt_title = 'Coc Code Actions',
     sorter = conf.generic_sorter(opts),
     finder = finders.new_table {
