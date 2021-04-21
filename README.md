@@ -24,6 +24,9 @@ require('telescope').load_extension('coc')
 - `commands`
 - `references`
 - `definitions`
+- `declarations`
+- `implementations`
+- `type_definitions`
 - `diagnostics`
 - `code_actions`
 - `line_code_actions`

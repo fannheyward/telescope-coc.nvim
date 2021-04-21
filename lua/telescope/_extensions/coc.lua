@@ -41,16 +41,21 @@ end
 
 local locations_to_items = function(locations)
   local items = {}
-  for _, r in ipairs(locations) do
-    local bufnr = vim.uri_to_bufnr(r.uri)
+  for _, l in ipairs(locations) do
+    if l.targetUri and l.targetRange then
+      -- LocationLink
+      l.uri = l.targetUri
+      l.range = l.targetRange
+    end
+    local bufnr = vim.uri_to_bufnr(l.uri)
     vim.fn.bufload(bufnr)
-    local filename = vim.uri_to_fname(r.uri)
-    local row = r.range.start.line
+    local filename = vim.uri_to_fname(l.uri)
+    local row = l.range.start.line
     local line = (vim.api.nvim_buf_get_lines(bufnr, row, row + 1, false) or {""})[1]
     items[#items+1] = {
       filename = filename,
       lnum = row + 1,
-      col = r.range.start.character + 1,
+      col = l.range.start.character + 1,
       text = line,
     }
   end
@@ -184,12 +189,12 @@ local file_code_actions = function(opts)
   handle_code_actions(opts, nil)
 end
 
-local definitions = function(opts)
-  if not is_ready('definition') then
+local function list_or_jump(opts)
+  if not is_ready(opts.coc_provider) then
     return
   end
 
-  local defs = vim.call('CocAction', 'definitions')
+  local defs = vim.call('CocAction', opts.coc_action)
   if type(defs) ~= 'table' or vim.tbl_isempty(defs) then
     return
   end
@@ -199,7 +204,7 @@ local definitions = function(opts)
   else
     local locations = locations_to_items(defs)
     pickers.new(opts, {
-      prompt_title = 'Coc Definitions',
+      prompt_title = opts.coc_title,
       previewer = conf.qflist_previewer(opts),
       sorter = conf.generic_sorter(opts),
       finder = finders.new_table {
@@ -208,6 +213,34 @@ local definitions = function(opts)
       },
     }):find()
   end
+end
+
+local definitions = function(opts)
+  opts.coc_provider = 'definition'
+  opts.coc_action = 'definitions'
+  opts.coc_title = 'Coc Definitions'
+  list_or_jump(opts)
+end
+
+local declarations = function(opts)
+  opts.coc_provider = 'declaration'
+  opts.coc_action = 'declarations'
+  opts.coc_title = 'Coc Declarations'
+  list_or_jump(opts)
+end
+
+local implementations = function(opts)
+  opts.coc_provider = 'implementation'
+  opts.coc_action = 'implementations'
+  opts.coc_title = 'Coc Implementations'
+  list_or_jump(opts)
+end
+
+local type_definitions = function(opts)
+  opts.coc_provider = 'typeDefinition'
+  opts.coc_action = 'typeDefinitions'
+  opts.coc_title = 'Coc TypeDefinitions'
+  list_or_jump(opts)
 end
 
 local references = function(opts)
@@ -408,8 +441,11 @@ return require('telescope').register_extension{
     links = links,
     commands = commands,
     references = references,
-    definitions = definitions,
     diagnostics = diagnostics,
+    definitions = definitions,
+    declarations = declarations,
+    implementations = implementations,
+    type_definitions = type_definitions,
     code_actions = cursor_code_actions,
     line_code_actions = line_code_actions,
     file_code_actions = file_code_actions,
