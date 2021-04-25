@@ -74,7 +74,11 @@ local mru = function(opts)
     return
   end
 
-  local results = utils.max_split(data, '\n')
+  local results = {}
+  local cwd = vim.loop.cwd() .. path.separator
+  for _, val in ipairs(utils.max_split(data, '\n')) do
+    results[#results+1] = val:gsub(cwd, '')
+  end
   pickers.new(opts, {
     prompt_title = 'Coc MRU',
     sorter = conf.generic_sorter(opts),
