@@ -77,7 +77,9 @@ local mru = function(opts)
   local results = {}
   local cwd = vim.loop.cwd() .. path.separator
   for _, val in ipairs(utils.max_split(data, '\n')) do
-    results[#results+1] = val:gsub(cwd, '')
+    if val:sub(1, #cwd) == cwd then
+      results[#results+1] = val:sub(#cwd+1)
+    end
   end
   pickers.new(opts, {
     prompt_title = 'Coc MRU',
