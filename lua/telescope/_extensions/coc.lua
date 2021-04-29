@@ -6,7 +6,7 @@ local finders = require('telescope.finders')
 local make_entry = require('telescope.make_entry')
 local pickers = require('telescope.pickers')
 local utils = require('telescope.utils')
-local Path = require('plenary.Path')
+local Path = require('plenary.path')
 local async = require('plenary.async_lib').async
 local string = string
 ---@diagnostic disable-next-line: undefined-global
