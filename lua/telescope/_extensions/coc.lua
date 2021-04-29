@@ -1,12 +1,12 @@
 local actions = require('telescope.actions')
 local action_state = require('telescope.actions.state')
 local themes = require('telescope.themes')
-local path = require('telescope.path')
 local conf = require('telescope.config').values
 local finders = require('telescope.finders')
 local make_entry = require('telescope.make_entry')
 local pickers = require('telescope.pickers')
 local utils = require('telescope.utils')
+local Path = require('plenary.Path')
 local async = require('plenary.async_lib').async
 local string = string
 ---@diagnostic disable-next-line: undefined-global
@@ -69,15 +69,15 @@ local mru = function(opts)
   end
 
   local home = vim.call('coc#util#get_data_home')
-  local data = path.read_file(home .. path.separator .. 'mru')
+  local data = Path:new(home .. Path.path.sep .. 'mru'):read()
   if not data or #data == 0 then
     return
   end
 
   local results = {}
-  local cwd = vim.loop.cwd() .. path.separator
+  local cwd = vim.loop.cwd() .. Path.path.sep
   for _, val in ipairs(utils.max_split(data, '\n')) do
-    if val:sub(1, #cwd) == cwd then
+    if val:sub(1, #cwd) == cwd and Path:new(val):exists() then
       results[#results+1] = val:sub(#cwd+1)
     end
   end
