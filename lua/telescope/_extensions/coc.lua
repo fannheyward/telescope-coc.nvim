@@ -77,7 +77,8 @@ local mru = function(opts)
   local results = {}
   local cwd = vim.loop.cwd() .. Path.path.sep
   for _, val in ipairs(utils.max_split(data, '\n')) do
-    if val:sub(1, #cwd) == cwd and Path:new(val):exists() then
+    local p = Path:new(val)
+    if p:exists() and p:is_file() and val:sub(1, #cwd) == cwd then
       results[#results+1] = val:sub(#cwd+1)
     end
   end
