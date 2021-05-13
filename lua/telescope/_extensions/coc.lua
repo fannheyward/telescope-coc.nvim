@@ -5,6 +5,7 @@ local conf = require('telescope.config').values
 local finders = require('telescope.finders')
 local make_entry = require('telescope.make_entry')
 local pickers = require('telescope.pickers')
+local entry_display = require('telescope.pickers.entry_display')
 local utils = require('telescope.utils')
 local Path = require('plenary.path')
 local async = require('plenary.async_lib').async
@@ -413,8 +414,18 @@ local commands = function(opts)
     return
   end
 
-  for _, cmd in ipairs(cmds) do
-    cmd.label = string.format("%s %s %s", cmd.id, string.rep(" ", 40-#cmd.id), cmd.title or ''):gsub(' $', '')
+  local displayer = entry_display.create {
+    separator = ' ',
+    items = {
+      { width = 40 },
+      { remaining = true },
+    },
+  }
+  local make_display = function(entry)
+    return displayer {
+      { entry.value, 'TelescopeResultsFunction' },
+      entry.description
+    }
   end
 
   pickers.new(opts, {
@@ -424,10 +435,11 @@ local commands = function(opts)
       results = cmds,
       entry_maker = function(line)
         return {
-          valid = line ~= nil,
-          value = line,
-          ordinal = line.label,
-          display = line.label,
+          value = line.id,
+          valid = line.id ~= nil,
+          ordinal = line.id,
+          display = make_display,
+          description = line.title or '',
         }
       end,
     }),
@@ -435,7 +447,7 @@ local commands = function(opts)
       actions.select_default:replace(function()
         local selection = action_state.get_selected_entry()
         actions.close(prompt_bufnr)
-        vim.call("CocActionAsync", "runCommand", selection.value.id)
+        vim.call("CocActionAsync", "runCommand", selection.value)
       end)
       return true
     end,
