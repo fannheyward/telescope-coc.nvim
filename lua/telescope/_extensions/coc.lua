@@ -382,7 +382,7 @@ local diagnostics = function(opts)
     end
   end
 
-  opts.path_display = utils.get_default(opts.path_display, true)
+  opts.path_display = utils.get_default(opts.path_display, "shorten")
   pickers.new(opts, {
     prompt_title = 'Coc Diagnostics',
     previewer = conf.qflist_previewer(opts),
@@ -399,7 +399,7 @@ end
 
 local workspace_diagnostics = function(opts)
   opts = utils.get_default(opts, {})
-  opts.path_display = utils.get_default(opts.path_display, false)
+  opts.path_display = utils.get_default(opts.path_display, "hidden")
   opts.prompt_title = 'Coc Workspace Diagnostics'
   opts.get_all = true
   diagnostics(opts)
