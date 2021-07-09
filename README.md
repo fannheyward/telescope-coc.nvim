@@ -22,6 +22,7 @@ require('telescope').load_extension('coc')
 - `mru`
 - `links`
 - `commands`
+- `locations`
 - `references`
 - `definitions`
 - `declarations`

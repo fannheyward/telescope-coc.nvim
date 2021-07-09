@@ -275,7 +275,7 @@ local references = function(opts)
   }):find()
 end
 
-local location = function(opts)
+local locations = function(opts)
   local refs = vim.g.coc_jump_locations
   local locations = locations_to_items(refs)
   pickers.new(opts, {
@@ -475,7 +475,7 @@ return require('telescope').register_extension{
     mru = mru,
     links = links,
     commands = commands,
-    location = location,
+    locations = locations,
     references = references,
     diagnostics = diagnostics,
     definitions = definitions,
