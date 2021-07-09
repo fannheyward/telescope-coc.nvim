@@ -275,6 +275,20 @@ local references = function(opts)
   }):find()
 end
 
+local location = function(opts)
+  local refs = vim.g.coc_jump_locations
+  local locations = locations_to_items(refs)
+  pickers.new(opts, {
+    prompt_title = 'Coc Locations',
+    previewer = conf.qflist_previewer(opts),
+    sorter = conf.generic_sorter(opts),
+    finder    = finders.new_table {
+      results = locations,
+      entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
+    },
+  }):find()
+end
+
 local document_symbols = function(opts)
   if not is_ready('documentSymbol') then
     return
@@ -461,6 +475,7 @@ return require('telescope').register_extension{
     mru = mru,
     links = links,
     commands = commands,
+    location = location,
     references = references,
     diagnostics = diagnostics,
     definitions = definitions,
