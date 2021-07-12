@@ -40,9 +40,9 @@ local function is_ready(feature)
   return ok
 end
 
-local locations_to_items = function(locations)
+local locations_to_items = function(locs)
   local items = {}
-  for _, l in ipairs(locations) do
+  for _, l in ipairs(locs) do
     if l.targetUri and l.targetRange then
       -- LocationLink
       l.uri = l.targetUri
@@ -108,14 +108,14 @@ local links = function(opts)
     return
   end
 
-  local results = vim.call('CocAction', 'links')
-  if type(results) ~= 'table' or vim.tbl_isempty(results) then
+  local res = vim.call('CocAction', 'links')
+  if type(res) ~= 'table' or vim.tbl_isempty(res) then
     return
   end
 
-  local locations = {}
-  for _, l in ipairs(results) do
-    locations[#locations+1] = {
+  local results = {}
+  for _, l in ipairs(res) do
+    results[#results+1] = {
       lnum = l.range.start.line + 1,
       col = l.range.start.character,
       text = l.target
@@ -126,7 +126,7 @@ local links = function(opts)
     prompt_title = 'Coc Document Links',
     sorter = conf.generic_sorter(opts),
     finder = finders.new_table {
-      results = locations,
+      results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
     },
     attach_mappings = function(prompt_bufnr)
@@ -212,13 +212,13 @@ local function list_or_jump(opts)
   if #defs == 1 then
     vim.lsp.util.jump_to_location(defs[1])
   else
-    local locations = locations_to_items(defs)
+    local results = locations_to_items(defs)
     pickers.new(opts, {
       prompt_title = opts.coc_title,
       previewer = conf.qflist_previewer(opts),
       sorter = conf.generic_sorter(opts),
       finder = finders.new_table {
-        results = locations,
+        results = results,
         entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
       },
     }):find()
@@ -263,13 +263,13 @@ local references = function(opts)
     return
   end
 
-  local locations = locations_to_items(refs)
+  local results = locations_to_items(refs)
   pickers.new(opts, {
     prompt_title = 'Coc References',
     previewer = conf.qflist_previewer(opts),
     sorter = conf.generic_sorter(opts),
     finder    = finders.new_table {
-      results = locations,
+      results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
     },
   }):find()
@@ -277,13 +277,13 @@ end
 
 local locations = function(opts)
   local refs = vim.g.coc_jump_locations
-  local locations = locations_to_items(refs)
+  local results = locations_to_items(refs)
   pickers.new(opts, {
     prompt_title = 'Coc Locations',
     previewer = conf.qflist_previewer(opts),
     sorter = conf.generic_sorter(opts),
     finder    = finders.new_table {
-      results = locations,
+      results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
     },
   }):find()
@@ -300,9 +300,9 @@ local document_symbols = function(opts)
     return
   end
 
-  local locations = {}
+  local results = {}
   for _, s in ipairs(symbols) do
-    locations[#locations+1] = {
+    results[#results+1] = {
       filename = vim.api.nvim_buf_get_name(current_buf),
       lnum = s.lnum,
       col = s.col,
@@ -316,7 +316,7 @@ local document_symbols = function(opts)
     prompt_title = 'Coc Document Symbols',
     previewer = conf.qflist_previewer(opts),
     finder    = finders.new_table {
-      results = locations,
+      results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_lsp_symbols(opts)
     },
     sorter = conf.prefilter_sorter{
@@ -328,15 +328,15 @@ end
 
 local function get_workspace_symbols_requester()
   return async(function(prompt)
-    local locations = {}
+    local results = {}
     local symbols = vim.call('CocAction', 'getWorkspaceSymbols', prompt)
     if type(symbols) ~= 'table' or vim.tbl_isempty(symbols) then
-      return locations
+      return results
     end
     for _, s in ipairs(symbols) do
       local filename = vim.uri_to_fname(s.location.uri)
       local kind = vim.lsp.protocol.SymbolKind[s.kind] or 'Unknown'
-      locations[#locations+1] = {
+      results[#results+1] = {
         filename = filename,
         lnum = s.location.range.start.line + 1,
         col = s.location.range.start.character + 1,
@@ -344,7 +344,7 @@ local function get_workspace_symbols_requester()
         text = string.format('[%s] %s', kind, s.name),
       }
     end
-    return locations
+    return results
   end)
 end
 
@@ -371,7 +371,7 @@ local diagnostics = function(opts)
   end
 
   opts = opts or {}
-  local locations = {}
+  local results = {}
   local buf_names = {}
   local current_buf = vim.api.nvim_get_current_buf()
   local current_filename = vim.api.nvim_buf_get_name(current_buf)
@@ -383,7 +383,7 @@ local diagnostics = function(opts)
   end
   for _, d in ipairs(diagnostics) do
     if opts.get_all or (d.file == current_filename) then
-      locations[#locations+1] = {
+      results[#results+1] = {
         bufnr = buf_names[d.file] or current_buf,
         filename = d.file,
         lnum = d.lnum,
@@ -401,7 +401,7 @@ local diagnostics = function(opts)
     prompt_title = 'Coc Diagnostics',
     previewer = conf.qflist_previewer(opts),
     finder = finders.new_table {
-      results = locations,
+      results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_lsp_diagnostics(opts)
     },
     sorter = conf.prefilter_sorter{
