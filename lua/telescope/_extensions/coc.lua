@@ -40,6 +40,9 @@ local function is_ready(feature)
 end
 
 local locations_to_items = function(locs)
+  if not locs then
+    return
+  end
   local items = {}
   for _, l in ipairs(locs) do
     if l.targetUri and l.targetRange then
@@ -212,6 +215,9 @@ local function list_or_jump(opts)
     vim.lsp.util.jump_to_location(defs[1])
   else
     local results = locations_to_items(defs)
+    if not results then
+      return
+    end
     pickers.new(opts, {
       prompt_title = opts.coc_title,
       previewer = conf.qflist_previewer(opts),
@@ -263,6 +269,9 @@ local references = function(opts)
   end
 
   local results = locations_to_items(refs)
+  if not results then
+    return
+  end
   pickers.new(opts, {
     prompt_title = 'Coc References',
     previewer = conf.qflist_previewer(opts),
@@ -277,6 +286,9 @@ end
 local locations = function(opts)
   local refs = vim.g.coc_jump_locations
   local results = locations_to_items(refs)
+  if not results then
+    return
+  end
   pickers.new(opts, {
     prompt_title = 'Coc Locations',
     previewer = conf.qflist_previewer(opts),
