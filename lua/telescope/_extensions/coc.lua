@@ -8,7 +8,6 @@ local pickers = require('telescope.pickers')
 local entry_display = require('telescope.pickers.entry_display')
 local utils = require('telescope.utils')
 local Path = require('plenary.path')
-local async = require('plenary.async_lib').async
 local string = string
 ---@diagnostic disable-next-line: undefined-global
 local vim = vim
@@ -327,7 +326,7 @@ local document_symbols = function(opts)
 end
 
 local function get_workspace_symbols_requester()
-  return async(function(prompt)
+  return function(prompt)
     local results = {}
     local symbols = vim.call('CocAction', 'getWorkspaceSymbols', prompt)
     if type(symbols) ~= 'table' or vim.tbl_isempty(symbols) then
@@ -345,7 +344,7 @@ local function get_workspace_symbols_requester()
       }
     end
     return results
-  end)
+  end
 end
 
 local workspace_symbols = function(opts)
