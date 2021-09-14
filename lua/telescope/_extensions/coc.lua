@@ -272,13 +272,47 @@ local references = function(opts)
   if not results then
     return
   end
+
+  local make_display = function(entry)
+    local line_info = { table.concat({ entry.lnum, entry.col }, ":"), "TelescopeResultsLineNr" }
+    local filename = utils.transform_path(opts, entry.filename)
+
+    local displayer = entry_display.create({
+      separator = "▏",
+      items = {
+        { width = 6 },
+        { width = 40 },
+        { remaining = true },
+      },
+    })
+
+    return displayer({
+      line_info,
+      filename,
+      entry.text:gsub(".* | ", ""),
+    })
+  end
+
   pickers.new(opts, {
     prompt_title = 'Coc References',
     previewer = conf.qflist_previewer(opts),
     sorter = conf.generic_sorter(opts),
     finder    = finders.new_table {
       results = results,
-      entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
+      entry_maker = function(entry)
+        return {
+          valid = true,
+
+          value = entry,
+          ordinal = (not opts.ignore_filename and entry.filename or "") .. " " .. entry.text,
+          display = make_display,
+
+          filename = entry.filename,
+          lnum = entry.lnum,
+          col = entry.col,
+          text = entry.text,
+        }
+      end,
     },
   }):find()
 end
