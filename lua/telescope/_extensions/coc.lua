@@ -1,12 +1,12 @@
-local actions = require 'telescope.actions'
-local action_state = require 'telescope.actions.state'
+local actions = require('telescope.actions')
+local action_state = require('telescope.actions.state')
 local conf = require('telescope.config').values
-local finders = require 'telescope.finders'
-local make_entry = require 'telescope.make_entry'
-local pickers = require 'telescope.pickers'
-local entry_display = require 'telescope.pickers.entry_display'
-local utils = require 'telescope.utils'
-local Path = require 'plenary.path'
+local finders = require('telescope.finders')
+local make_entry = require('telescope.make_entry')
+local pickers = require('telescope.pickers')
+local entry_display = require('telescope.pickers.entry_display')
+local utils = require('telescope.utils')
+local Path = require('plenary.path')
 
 local fn = vim.fn
 local api = vim.api
@@ -15,7 +15,7 @@ local CocActionAsync = fn.CocActionAsync
 
 local function is_ready(feature)
   if vim.g.coc_service_initialized ~= 1 then
-    print 'Coc is not ready!'
+    print('Coc is not ready!')
     return
   end
 
@@ -59,7 +59,7 @@ local mru = function(opts)
     return
   end
 
-  local home = vim.call 'coc#util#get_data_home'
+  local home = vim.call('coc#util#get_data_home')
   local data = Path:new(home .. Path.path.sep .. 'mru'):read()
   if not data or #data == 0 then
     return
@@ -79,7 +79,7 @@ local mru = function(opts)
     prompt_title = 'Coc MRU',
     sorter = conf.generic_sorter(opts),
     previewer = conf.qflist_previewer(opts),
-    finder = finders.new_table {
+    finder = finders.new_table({
       results = results,
       entry_maker = function(line)
         return {
@@ -89,22 +89,22 @@ local mru = function(opts)
           display = line,
         }
       end,
-    },
+    }),
   }):find()
 end
 
 local links = function(opts)
-  if not is_ready 'documentLink' then
+  if not is_ready('documentLink') then
     return
   end
 
-  local res = CocAction 'links'
+  local res = CocAction('links')
   if type(res) ~= 'table' then
     return
   end
 
   if vim.tbl_isempty(res) then
-    print 'No links available'
+    print('No links available')
     return
   end
 
@@ -120,15 +120,15 @@ local links = function(opts)
   pickers.new(opts, {
     prompt_title = 'Coc Document Links',
     sorter = conf.generic_sorter(opts),
-    finder = finders.new_table {
+    finder = finders.new_table({
       results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
-    },
+    }),
     attach_mappings = function(prompt_bufnr)
       actions.select_default:replace(function()
         actions.close(prompt_bufnr)
         local text = action_state.get_selected_entry().value.text
-        if text:find 'https?://' then
+        if text:find('https?://') then
           local opener = (jit.os == 'OSX' and 'open') or 'xdg-open'
           os.execute(opener .. ' ' .. text)
         end
@@ -140,7 +140,7 @@ local links = function(opts)
 end
 
 local handle_code_actions = function(opts, mode)
-  if not is_ready 'codeAction' then
+  if not is_ready('codeAction') then
     return
   end
 
@@ -150,7 +150,7 @@ local handle_code_actions = function(opts, mode)
   end
 
   if vim.tbl_isempty(results) then
-    print 'No available code actions'
+    print('No available code actions')
     return
   end
 
@@ -161,7 +161,7 @@ local handle_code_actions = function(opts, mode)
   pickers.new(opts, {
     prompt_title = 'Coc Code Actions',
     sorter = conf.generic_sorter(opts),
-    finder = finders.new_table {
+    finder = finders.new_table({
       results = results,
       entry_maker = function(line)
         return {
@@ -171,7 +171,7 @@ local handle_code_actions = function(opts, mode)
           display = line.idx .. ': ' .. line.title,
         }
       end,
-    },
+    }),
     attach_mappings = function(prompt_bufnr)
       actions.select_default:replace(function()
         actions.close(prompt_bufnr)
@@ -221,10 +221,10 @@ local function list_or_jump(opts)
       prompt_title = opts.coc_title,
       previewer = conf.qflist_previewer(opts),
       sorter = conf.generic_sorter(opts),
-      finder = finders.new_table {
+      finder = finders.new_table({
         results = results,
         entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
-      },
+      }),
     }):find()
   end
 end
@@ -258,11 +258,11 @@ local type_definitions = function(opts)
 end
 
 local references = function(opts)
-  if not is_ready 'reference' then
+  if not is_ready('reference') then
     return
   end
 
-  local refs = CocAction 'references'
+  local refs = CocAction('references')
   if type(refs) ~= 'table' or vim.tbl_isempty(refs) then
     return
   end
@@ -276,27 +276,27 @@ local references = function(opts)
     local line_info = { table.concat({ entry.lnum, entry.col }, ':'), 'TelescopeResultsLineNr' }
     local filename = utils.transform_path(opts, entry.filename)
 
-    local displayer = entry_display.create {
+    local displayer = entry_display.create({
       separator = '▏',
       items = {
         { width = 6 },
         { width = 40 },
         { remaining = true },
       },
-    }
+    })
 
-    return displayer {
+    return displayer({
       line_info,
       filename,
       entry.text:gsub('.* | ', ''),
-    }
+    })
   end
 
   pickers.new(opts, {
     prompt_title = 'Coc References',
     previewer = conf.qflist_previewer(opts),
     sorter = conf.generic_sorter(opts),
-    finder = finders.new_table {
+    finder = finders.new_table({
       results = results,
       entry_maker = function(entry)
         return {
@@ -312,7 +312,7 @@ local references = function(opts)
           text = entry.text,
         }
       end,
-    },
+    }),
   }):find()
 end
 
@@ -326,15 +326,15 @@ local locations = function(opts)
     prompt_title = 'Coc Locations',
     previewer = conf.qflist_previewer(opts),
     sorter = conf.generic_sorter(opts),
-    finder = finders.new_table {
+    finder = finders.new_table({
       results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
-    },
+    }),
   }):find()
 end
 
 local document_symbols = function(opts)
-  if not is_ready 'documentSymbol' then
+  if not is_ready('documentSymbol') then
     return
   end
 
@@ -359,14 +359,14 @@ local document_symbols = function(opts)
   pickers.new(opts, {
     prompt_title = 'Coc Document Symbols',
     previewer = conf.qflist_previewer(opts),
-    finder = finders.new_table {
+    finder = finders.new_table({
       results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_lsp_symbols(opts),
-    },
-    sorter = conf.prefilter_sorter {
+    }),
+    sorter = conf.prefilter_sorter({
       tag = 'symbol_type',
       sorter = conf.generic_sorter(opts),
-    },
+    }),
   }):find()
 end
 
@@ -395,10 +395,10 @@ end
 local workspace_symbols = function(opts)
   pickers.new(opts, {
     prompt_title = 'Coc Workspace Symbols',
-    finder = finders.new_dynamic {
+    finder = finders.new_dynamic({
       entry_maker = opts.entry_maker or make_entry.gen_from_lsp_symbols(opts),
       fn = get_workspace_symbols_requester(),
-    },
+    }),
     previewer = conf.qflist_previewer(opts),
     sorter = conf.generic_sorter(),
   }):find()
@@ -409,7 +409,7 @@ local diagnostics = function(opts)
     return
   end
 
-  local diagnostics = CocAction 'diagnosticList'
+  local diagnostics = CocAction('diagnosticList')
   if type(diagnostics) ~= 'table' or vim.tbl_isempty(diagnostics) then
     return
   end
@@ -444,14 +444,14 @@ local diagnostics = function(opts)
   pickers.new(opts, {
     prompt_title = 'Coc Diagnostics',
     previewer = conf.qflist_previewer(opts),
-    finder = finders.new_table {
+    finder = finders.new_table({
       results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_lsp_diagnostics(opts),
-    },
-    sorter = conf.prefilter_sorter {
+    }),
+    sorter = conf.prefilter_sorter({
       tag = 'type',
       sorter = conf.generic_sorter(opts),
-    },
+    }),
   }):find()
 end
 
@@ -468,30 +468,30 @@ local commands = function(opts)
     return
   end
 
-  local cmds = CocAction 'commands'
+  local cmds = CocAction('commands')
   if type(cmds) ~= 'table' or vim.tbl_isempty(cmds) then
-    print 'No commands available'
+    print('No commands available')
     return
   end
 
-  local displayer = entry_display.create {
+  local displayer = entry_display.create({
     separator = ' ',
     items = {
       { width = 40 },
       { remaining = true },
     },
-  }
+  })
   local make_display = function(entry)
-    return displayer {
+    return displayer({
       { entry.value, 'TelescopeResultsFunction' },
       entry.description,
-    }
+    })
   end
 
   pickers.new(opts, {
     prompt_title = 'Coc Commands',
     sorter = conf.generic_sorter(opts),
-    finder = finders.new_table {
+    finder = finders.new_table({
       results = cmds,
       entry_maker = function(line)
         return {
@@ -502,7 +502,7 @@ local commands = function(opts)
           description = line.title or '',
         }
       end,
-    },
+    }),
     attach_mappings = function(prompt_bufnr)
       actions.select_default:replace(function()
         local selection = action_state.get_selected_entry()
@@ -514,7 +514,7 @@ local commands = function(opts)
   }):find()
 end
 
-return require('telescope').register_extension {
+return require('telescope').register_extension({
   exports = {
     mru = mru,
     links = links,
@@ -533,6 +533,6 @@ return require('telescope').register_extension {
     workspace_symbols = workspace_symbols,
     workspace_diagnostics = workspace_diagnostics,
   },
-}
+})
 
 -- vim: set sw=2 ts=2 sts=2 et
