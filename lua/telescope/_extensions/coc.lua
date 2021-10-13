@@ -8,6 +8,12 @@ local entry_display = require('telescope.pickers.entry_display')
 local utils = require('telescope.utils')
 local Path = require('plenary.path')
 
+local string = string
+---@diagnostic disable-next-line: undefined-global
+local vim = vim
+---@diagnostic disable-next-line: undefined-global
+local jit = jit
+
 local fn = vim.fn
 local api = vim.api
 local CocAction = fn.CocAction
