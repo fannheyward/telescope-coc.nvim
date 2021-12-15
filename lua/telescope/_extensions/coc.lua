@@ -441,7 +441,7 @@ local diagnostics = function(opts)
         start = d.location.range.start,
         finish = d.location.range['end'],
         text = vim.trim(d.message:gsub('[\n]', '')),
-        type = d.severity,
+        type = d.severity:upper(),
       }
     end
   end
@@ -452,7 +452,7 @@ local diagnostics = function(opts)
     previewer = conf.qflist_previewer(opts),
     finder = finders.new_table({
       results = results,
-      entry_maker = opts.entry_maker or make_entry.gen_from_lsp_diagnostics(opts),
+      entry_maker = opts.entry_maker or make_entry.gen_from_diagnostics(opts),
     }),
     sorter = conf.prefilter_sorter({
       tag = 'type',
