@@ -268,7 +268,8 @@ local references = function(opts)
     return
   end
 
-  local refs = CocAction('references')
+  local excludeDeclaration = opts.excludeDeclaration or false
+  local refs = CocAction('references', excludeDeclaration)
   if type(refs) ~= 'table' or vim.tbl_isempty(refs) then
     return
   end
@@ -320,6 +321,11 @@ local references = function(opts)
       end,
     }),
   }):find()
+end
+
+local references_used = function(opts)
+  opts.excludeDeclaration = true
+  references(opts)
 end
 
 local locations = function(opts)
@@ -531,6 +537,7 @@ return require('telescope').register_extension({
     commands = commands,
     locations = locations,
     references = references,
+    references_used = references_used,
     diagnostics = diagnostics,
     definitions = definitions,
     declarations = declarations,
