@@ -432,6 +432,10 @@ local diagnostics = function(opts)
     end
   end
   for _, d in ipairs(diagnostics) do
+    if d.severity == 'Information' then
+      d.severity = 'Info'
+    end
+    print(vim.inspect(d.severity))
     if opts.get_all or (d.file == current_filename) then
       results[#results + 1] = {
         bufnr = buf_names[d.file] or current_buf,
