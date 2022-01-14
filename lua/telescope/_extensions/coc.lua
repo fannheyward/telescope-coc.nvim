@@ -81,6 +81,17 @@ local mru = function(opts)
       results[#results + 1] = val:sub(#cwd + 1)
     end
   end
+
+  local make_display = function(text)
+    local display, hl_group = utils.transform_devicons(text, text)
+
+    if hl_group then
+      return display, { { { 1, 3 }, hl_group } }
+    else
+      return display
+    end
+  end
+
   pickers.new(opts, {
     prompt_title = 'Coc MRU',
     sorter = conf.generic_sorter(opts),
@@ -92,7 +103,7 @@ local mru = function(opts)
           valid = line ~= nil,
           value = line,
           ordinal = line,
-          display = line,
+          display = make_display(line),
         }
       end,
     }),
