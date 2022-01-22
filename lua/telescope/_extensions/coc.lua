@@ -438,7 +438,7 @@ local diagnostics = function(opts)
   end
 
   opts = opts or {}
-  local prompt_title = opts.prompt_title or 'Coc Diagnostics'
+  local prompt_title = opts.prompt_title or 'Coc Diagnosticszz'
   local results = {}
   local buf_names = {}
   local current_buf = api.nvim_get_current_buf()
