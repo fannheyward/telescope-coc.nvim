@@ -438,6 +438,7 @@ local diagnostics = function(opts)
   end
 
   opts = opts or {}
+  local prompt_title = opts.prompt_title or 'Coc Diagnostics'
   local results = {}
   local buf_names = {}
   local current_buf = api.nvim_get_current_buf()
@@ -468,7 +469,7 @@ local diagnostics = function(opts)
 
   opts.path_display = utils.get_default(opts.path_display, 'hidden')
   pickers.new(opts, {
-    prompt_title = 'Coc Diagnostics',
+    prompt_title = prompt_title,
     previewer = conf.qflist_previewer(opts),
     finder = finders.new_table({
       results = results,
