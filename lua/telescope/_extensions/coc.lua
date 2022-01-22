@@ -93,7 +93,7 @@ local mru = function(opts)
   end
 
   pickers.new(opts, {
-    prompt_title = 'Coc MRU',
+    prompt_title = opts.prompt_title or 'Coc MRU',
     sorter = conf.generic_sorter(opts),
     previewer = conf.qflist_previewer(opts),
     finder = finders.new_table({
@@ -135,7 +135,7 @@ local links = function(opts)
   end
 
   pickers.new(opts, {
-    prompt_title = 'Coc Document Links',
+    prompt_title = opts.prompt_title or 'Coc Document Links',
     sorter = conf.generic_sorter(opts),
     finder = finders.new_table({
       results = results,
@@ -176,7 +176,7 @@ local handle_code_actions = function(opts, mode)
   end
 
   pickers.new(opts, {
-    prompt_title = 'Coc Code Actions',
+    prompt_title = opts.prompt_title or 'Coc Code Actions',
     sorter = conf.generic_sorter(opts),
     finder = finders.new_table({
       results = results,
@@ -235,7 +235,7 @@ local function list_or_jump(opts)
       return
     end
     pickers.new(opts, {
-      prompt_title = opts.coc_title,
+      prompt_title = opts.prompt_title or opts.coc_title,
       previewer = conf.qflist_previewer(opts),
       sorter = conf.generic_sorter(opts),
       finder = finders.new_table({
@@ -311,7 +311,7 @@ local references = function(opts)
   end
 
   pickers.new(opts, {
-    prompt_title = 'Coc References',
+    prompt_title = opts.prompt_title or 'Coc References',
     previewer = conf.qflist_previewer(opts),
     sorter = conf.generic_sorter(opts),
     finder = finders.new_table({
@@ -346,7 +346,7 @@ local locations = function(opts)
     return
   end
   pickers.new(opts, {
-    prompt_title = 'Coc Locations',
+    prompt_title = opts.prompt_title or 'Coc Locations',
     previewer = conf.qflist_previewer(opts),
     sorter = conf.generic_sorter(opts),
     finder = finders.new_table({
@@ -380,7 +380,7 @@ local document_symbols = function(opts)
 
   opts.ignore_filename = opts.ignore_filename or true
   pickers.new(opts, {
-    prompt_title = 'Coc Document Symbols',
+    prompt_title = opts.prompt_title or 'Coc Document Symbols',
     previewer = conf.qflist_previewer(opts),
     finder = finders.new_table({
       results = results,
@@ -417,7 +417,7 @@ end
 
 local workspace_symbols = function(opts)
   pickers.new(opts, {
-    prompt_title = 'Coc Workspace Symbols',
+    prompt_title = opts.prompt_title or 'Coc Workspace Symbols',
     finder = finders.new_dynamic({
       entry_maker = opts.entry_maker or make_entry.gen_from_lsp_symbols(opts),
       fn = get_workspace_symbols_requester(),
@@ -438,7 +438,6 @@ local diagnostics = function(opts)
   end
 
   opts = opts or {}
-  local prompt_title = opts.prompt_title or 'Coc Diagnosticszz'
   local results = {}
   local buf_names = {}
   local current_buf = api.nvim_get_current_buf()
@@ -469,7 +468,7 @@ local diagnostics = function(opts)
 
   opts.path_display = utils.get_default(opts.path_display, 'hidden')
   pickers.new(opts, {
-    prompt_title = prompt_title,
+    prompt_title = opts.prompt_title or 'Coc Diagnostics',
     previewer = conf.qflist_previewer(opts),
     finder = finders.new_table({
       results = results,
@@ -516,7 +515,7 @@ local commands = function(opts)
   end
 
   pickers.new(opts, {
-    prompt_title = 'Coc Commands',
+    prompt_title = opts.prompt_title or 'Coc Commands',
     sorter = conf.generic_sorter(opts),
     finder = finders.new_table({
       results = cmds,
