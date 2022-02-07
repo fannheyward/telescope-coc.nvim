@@ -451,6 +451,8 @@ local diagnostics = function(opts)
   for _, d in ipairs(diagnostics) do
     if d.severity == 'Information' then
       d.severity = 'Info'
+    elseif d.severity == 'Warning' then
+      d.severity = 'Warn'
     end
     if opts.get_all or (d.file == current_filename) then
       results[#results + 1] = {
