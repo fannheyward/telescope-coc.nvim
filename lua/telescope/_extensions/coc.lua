@@ -542,8 +542,34 @@ local commands = function(opts)
   }):find()
 end
 
+local function subcommands(opts)
+  local cmds = require('telescope.command').get_extensions_subcommand().coc
+  cmds = vim.tbl_filter(function(v)
+    return v ~= 'coc'
+  end, cmds)
+
+  pickers.new(opts, {
+    prompt_title = 'Telescope Coc',
+    finder = finders.new_table({
+      results = cmds,
+    }),
+    sorter = conf.generic_sorter(opts),
+    attach_mappings = function(prompt_bufnr)
+      actions.select_default:replace(function()
+        local selection = action_state.get_selected_entry()
+        actions.close(prompt_bufnr)
+        vim.defer_fn(function()
+          require('telescope').extensions.coc[selection.value](opts)
+        end, 20)
+      end)
+      return true
+    end,
+  }):find()
+end
+
 return require('telescope').register_extension({
   exports = {
+    coc = subcommands,
     mru = mru,
     links = links,
     commands = commands,
