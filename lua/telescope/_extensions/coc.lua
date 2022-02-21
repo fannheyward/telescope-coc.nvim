@@ -502,6 +502,35 @@ local commands = function(opts)
     return
   end
 
+  local results = {}
+
+  local ok, history = pcall(function()
+    return vim.split((Path:new(vim.fn['coc#util#get_data_home'](), 'commands'):read()), '\n')
+  end)
+  if ok then
+    local id2title = {}
+    for _, cmd in ipairs(cmds) do
+      id2title[cmd.id] = cmd.title
+    end
+
+    local exists = {}
+    for _, id in ipairs(history) do
+      local title = id2title[id]
+      if title then
+        table.insert(results, { id = id, title = title })
+        exists[id] = true
+      end
+    end
+
+    for _, cmd in pairs(cmds) do
+      if not exists[cmd.id] then
+        table.insert(results, cmd)
+      end
+    end
+  else
+    results = cmds
+  end
+
   local displayer = entry_display.create({
     separator = ' ',
     items = {
@@ -520,7 +549,7 @@ local commands = function(opts)
     prompt_title = 'Coc Commands',
     sorter = conf.generic_sorter(opts),
     finder = finders.new_table({
-      results = cmds,
+      results = results,
       entry_maker = function(line)
         return {
           value = line.id,
