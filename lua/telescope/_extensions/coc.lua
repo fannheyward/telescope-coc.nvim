@@ -515,16 +515,19 @@ local commands = function(opts)
 
     local exists = {}
     for _, id in ipairs(history) do
-      local title = id2title[id]
-      if title then
-        table.insert(results, { id = id, title = title })
-        exists[id] = true
+      if not exists[id] then
+        local title = id2title[id]
+        if title then
+          table.insert(results, { id = id, title = title })
+          exists[id] = true
+        end
       end
     end
 
     for _, cmd in pairs(cmds) do
       if not exists[cmd.id] then
         table.insert(results, cmd)
+        exists[cmd.id] = true
       end
     end
   else
