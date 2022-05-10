@@ -294,7 +294,7 @@ local references = function(opts)
     separator = '▏',
     items = {
       { width = 6 },
-      { width = 40 },
+      -- { width = 40 },
       { remaining = true },
     },
   })
@@ -306,7 +306,7 @@ local references = function(opts)
     return displayer({
       line_info,
       filename,
-      entry.text:gsub('.* | ', ''),
+      -- entry.text:gsub('.* | ', ''),
     })
   end
 
