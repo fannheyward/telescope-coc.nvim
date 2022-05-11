@@ -246,11 +246,68 @@ local function list_or_jump(opts)
   end
 end
 
+local custom_list = function(opts)
+  if not is_ready(opts.coc_provider) then
+    return
+  end
+
+  local refs = CocAction(opts.coc_action, opts.excludeDeclaration)
+  if type(refs) ~= 'table' or vim.tbl_isempty(refs) then
+    return
+  end
+
+  local results = locations_to_items(refs)
+  if not results then
+    return
+  end
+
+  local displayer = entry_display.create({
+    separator = '▏',
+    items = {
+      { width = 6 },
+      { remaining = true },
+    },
+  })
+
+  local make_display = function(entry)
+    local line_info = { table.concat({ entry.lnum, entry.col }, ':'), 'TelescopeResultsLineNr' }
+    local filename = utils.transform_path(opts, entry.filename)
+
+    return displayer({
+      line_info,
+      filename,
+    })
+  end
+
+  pickers.new(opts, {
+    prompt_title = opts.coc_title,
+    previewer = conf.qflist_previewer(opts),
+    sorter = conf.generic_sorter(opts),
+    finder = finders.new_table({
+      results = results,
+      entry_maker = function(entry)
+        return {
+          valid = true,
+
+          value = entry,
+          ordinal = (not opts.ignore_filename and entry.filename or '') .. ' ' .. entry.text,
+          display = make_display,
+
+          filename = entry.filename,
+          lnum = entry.lnum,
+          col = entry.col,
+          text = entry.text,
+        }
+      end,
+    }),
+  }):find()
+end
+
 local definitions = function(opts)
   opts.coc_provider = 'definition'
   opts.coc_action = 'definitions'
   opts.coc_title = 'Coc Definitions'
-  list_or_jump(opts)
+  custom_list(opts)
 end
 
 local declarations = function(opts)
@@ -275,63 +332,10 @@ local type_definitions = function(opts)
 end
 
 local references = function(opts)
-  if not is_ready('reference') then
-    return
-  end
-
-  local excludeDeclaration = opts.excludeDeclaration or false
-  local refs = CocAction('references', excludeDeclaration)
-  if type(refs) ~= 'table' or vim.tbl_isempty(refs) then
-    return
-  end
-
-  local results = locations_to_items(refs)
-  if not results then
-    return
-  end
-
-  local displayer = entry_display.create({
-    separator = '▏',
-    items = {
-      { width = 6 },
-      -- { width = 40 },
-      { remaining = true },
-    },
-  })
-
-  local make_display = function(entry)
-    local line_info = { table.concat({ entry.lnum, entry.col }, ':'), 'TelescopeResultsLineNr' }
-    local filename = utils.transform_path(opts, entry.filename)
-
-    return displayer({
-      line_info,
-      filename,
-      -- entry.text:gsub('.* | ', ''),
-    })
-  end
-
-  pickers.new(opts, {
-    prompt_title = 'Coc References',
-    previewer = conf.qflist_previewer(opts),
-    sorter = conf.generic_sorter(opts),
-    finder = finders.new_table({
-      results = results,
-      entry_maker = function(entry)
-        return {
-          valid = true,
-
-          value = entry,
-          ordinal = (not opts.ignore_filename and entry.filename or '') .. ' ' .. entry.text,
-          display = make_display,
-
-          filename = entry.filename,
-          lnum = entry.lnum,
-          col = entry.col,
-          text = entry.text,
-        }
-      end,
-    }),
-  }):find()
+  opts.coc_provider = 'reference'
+  opts.coc_action = 'references'
+  opts.coc_title = 'Coc References'
+  custom_list(opts)
 end
 
 local references_used = function(opts)
