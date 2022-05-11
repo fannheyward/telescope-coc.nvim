@@ -264,18 +264,20 @@ local custom_list = function(opts)
   local displayer = entry_display.create({
     separator = '▏',
     items = {
-      { width = 6 },
+      -- { width = 6 },
+      -- { width = 40 },
       { remaining = true },
     },
   })
 
   local make_display = function(entry)
-    local line_info = { table.concat({ entry.lnum, entry.col }, ':'), 'TelescopeResultsLineNr' }
+    -- local line_info = { table.concat({ entry.lnum, entry.col }, ':'), 'TelescopeResultsLineNr' }
     local filename = utils.transform_path(opts, entry.filename)
 
     return displayer({
-      line_info,
+      -- line_info,
       filename,
+      -- entry.text:gsub('.* | ', ''),
     })
   end
 
