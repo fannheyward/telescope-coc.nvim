@@ -316,7 +316,7 @@ local definitions = function(opts)
   opts.coc_action = 'definitions'
   opts.coc_title = 'Coc Definitions'
   opts.exec = function ()
-    vim.api.nvim_command('call CocAction("jumpDefinition")')
+    vim.api.nvim_command('call CocAction("jumpDefinition", v:false)')
   end
   custom_list(opts)
 end
@@ -347,7 +347,7 @@ local references = function(opts)
   opts.coc_action = 'references'
   opts.coc_title = 'Coc References'
   opts.exec = function ()
-    vim.api.nvim_command('call CocAction("jumpReferences")')
+    vim.api.nvim_command('call CocAction("jumpReferences", v:false)')
   end
   custom_list(opts)
 end
