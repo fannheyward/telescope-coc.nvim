@@ -256,59 +256,68 @@ local custom_list = function(opts)
     return
   end
 
-  local results = locations_to_items(refs)
-  if not results then
+  -- 结果超过 100 个时, 用 CocAction 替代
+  if refs[101] and type(opts.exec) == "function" then
+    opts.exec()
     return
-  end
+  else
+    local results = locations_to_items(refs)
+    if not results then
+      return
+    end
 
-  local displayer = entry_display.create({
-    separator = '▏',
-    items = {
-      -- { width = 6 },
-      -- { width = 40 },
-      { remaining = true },
-    },
-  })
-
-  local make_display = function(entry)
-    -- local line_info = { table.concat({ entry.lnum, entry.col }, ':'), 'TelescopeResultsLineNr' }
-    local filename = utils.transform_path(opts, entry.filename)
-
-    return displayer({
-      -- line_info,
-      filename,
-      -- entry.text:gsub('.* | ', ''),
+    local displayer = entry_display.create({
+      separator = '▏',
+      items = {
+        -- { width = 6 },
+        -- { width = 40 },
+        { remaining = true },
+      },
     })
+
+    local make_display = function(entry)
+      -- local line_info = { table.concat({ entry.lnum, entry.col }, ':'), 'TelescopeResultsLineNr' }
+      local filename = utils.transform_path(opts, entry.filename)
+
+      return displayer({
+        -- line_info,
+        filename,
+        -- entry.text:gsub('.* | ', ''),
+      })
+    end
+
+    pickers.new(opts, {
+      prompt_title = opts.coc_title,
+      previewer = conf.qflist_previewer(opts),
+      sorter = conf.generic_sorter(opts),
+      finder = finders.new_table({
+        results = results,
+        entry_maker = function(entry)
+          return {
+            valid = true,
+
+            value = entry,
+            ordinal = (not opts.ignore_filename and entry.filename or '') .. ' ' .. entry.text,
+            display = make_display,
+
+            filename = entry.filename,
+            lnum = entry.lnum,
+            col = entry.col,
+            text = entry.text,
+          }
+        end,
+      }),
+    }):find()
   end
-
-  pickers.new(opts, {
-    prompt_title = opts.coc_title,
-    previewer = conf.qflist_previewer(opts),
-    sorter = conf.generic_sorter(opts),
-    finder = finders.new_table({
-      results = results,
-      entry_maker = function(entry)
-        return {
-          valid = true,
-
-          value = entry,
-          ordinal = (not opts.ignore_filename and entry.filename or '') .. ' ' .. entry.text,
-          display = make_display,
-
-          filename = entry.filename,
-          lnum = entry.lnum,
-          col = entry.col,
-          text = entry.text,
-        }
-      end,
-    }),
-  }):find()
 end
 
 local definitions = function(opts)
   opts.coc_provider = 'definition'
   opts.coc_action = 'definitions'
   opts.coc_title = 'Coc Definitions'
+  opts.exec = function ()
+    vim.api.nvim_command('call CocAction("jumpDefinition")')
+  end
   custom_list(opts)
 end
 
@@ -337,6 +346,9 @@ local references = function(opts)
   opts.coc_provider = 'reference'
   opts.coc_action = 'references'
   opts.coc_title = 'Coc References'
+  opts.exec = function ()
+    vim.api.nvim_command('call CocAction("jumpReferences")')
+  end
   custom_list(opts)
 end
 
