@@ -450,8 +450,8 @@ local diagnostics = function(opts)
     return
   end
 
-  local diagnostics = CocAction('diagnosticList')
-  if type(diagnostics) ~= 'table' or vim.tbl_isempty(diagnostics) then
+  local diagnosticsList = CocAction('diagnosticList')
+  if type(diagnosticsList) ~= 'table' or vim.tbl_isempty(diagnosticsList) then
     return
   end
 
@@ -466,7 +466,7 @@ local diagnostics = function(opts)
       buf_names[api.nvim_buf_get_name(bn)] = bn
     end
   end
-  for _, d in ipairs(diagnostics) do
+  for _, d in ipairs(diagnosticsList) do
     if d.severity == 'Information' then
       d.severity = 'Info'
     elseif d.severity == 'Warning' then
