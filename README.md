@@ -15,9 +15,15 @@ that allows you to find/filter/preview/pick results from [coc.nvim](https://gith
 ## Get Started
 
 ```viml
+Plug 'nvim-telescope/telescope.nvim'
 Plug 'fannheyward/telescope-coc.nvim'
 
 ...
+require("telescope").setup({
+  extensions = {
+    coc = { theme = 'ivy' }
+  },
+})
 require('telescope').load_extension('coc')
 ```
 
