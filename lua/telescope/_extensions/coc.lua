@@ -14,6 +14,7 @@ local vim = vim
 ---@diagnostic disable-next-line: undefined-global
 local jit = jit
 
+local F = vim.F
 local fn = vim.fn
 local api = vim.api
 local CocAction = fn.CocAction
@@ -497,7 +498,7 @@ local diagnostics = function(opts)
     end
   end
 
-  opts.path_display = utils.get_default(opts.path_display, 'hidden')
+  opts.path_display = F.if_nil(opts.path_display, 'hidden')
   pickers.new(opts, {
     prompt_title = 'Coc Diagnostics',
     previewer = conf.qflist_previewer(opts),
@@ -513,8 +514,8 @@ local diagnostics = function(opts)
 end
 
 local workspace_diagnostics = function(opts)
-  opts = utils.get_default(opts, {})
-  opts.path_display = utils.get_default(opts.path_display, 'shorten')
+  opts = F.if_nil(opts, {})
+  opts.path_display = F.if_nil(opts.path_display, 'shorten')
   opts.prompt_title = 'Coc Workspace Diagnostics'
   opts.get_all = true
   diagnostics(opts)
