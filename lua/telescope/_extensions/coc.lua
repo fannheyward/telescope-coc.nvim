@@ -242,7 +242,7 @@ local function list_or_jump(opts)
 
   if vim.tbl_isempty(defs) then
     print(('No %s found'):format(opts.coc_action))
-  elseif #defs == 1 then
+  elseif #defs == 1 and not config.prefer_locations then
     CocActionAsync('runCommand', 'workspace.openLocation', nil, defs[1])
   else
     local results = locations_to_items(defs)
@@ -639,6 +639,9 @@ return require('telescope').register_extension({
   setup = function(ext_config)
     if ext_config.theme then
       config.theme = require('telescope.themes')['get_' .. ext_config.theme]()
+    end
+    if ext_config.prefer_locations then
+      config.prefer_locations = true
     end
   end,
   exports = {

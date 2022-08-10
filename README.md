@@ -21,7 +21,10 @@ Plug 'fannheyward/telescope-coc.nvim'
 ...
 require("telescope").setup({
   extensions = {
-    coc = { theme = 'ivy' }
+    coc = {
+        theme = 'ivy',
+        prefer_locations = true, -- always use Telescope locations to preview definitions/declarations/implementations etc
+    }
   },
 })
 require('telescope').load_extension('coc')
