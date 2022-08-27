@@ -18,7 +18,7 @@ that allows you to find/filter/preview/pick results from [coc.nvim](https://gith
 Plug 'nvim-telescope/telescope.nvim'
 Plug 'fannheyward/telescope-coc.nvim'
 
-...
+lua << EOF
 require("telescope").setup({
   extensions = {
     coc = {
@@ -28,6 +28,7 @@ require("telescope").setup({
   },
 })
 require('telescope').load_extension('coc')
+EOF
 ```
 
 ## Usage
