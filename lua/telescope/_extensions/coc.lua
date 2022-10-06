@@ -141,6 +141,9 @@ local links = function(opts)
       col = l.range.start.character,
       text = l.target,
     }
+    if l.target:find('file://') then
+      results[#results].filename = vim.uri_to_fname(l.target)
+    end
   end
 
   pickers.new(opts, {
@@ -153,10 +156,13 @@ local links = function(opts)
     attach_mappings = function(prompt_bufnr)
       actions.select_default:replace(function()
         actions.close(prompt_bufnr)
-        local text = action_state.get_selected_entry().value.text
+        local selection = action_state.get_selected_entry()
+        local text = selection.text
         if text:find('https?://') then
           local opener = (jit.os == 'OSX' and 'open') or 'xdg-open'
           os.execute(opener .. ' ' .. text)
+        else
+          vim.fn.execute('edit ' .. selection.filename)
         end
       end)
 
