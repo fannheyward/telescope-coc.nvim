@@ -78,13 +78,16 @@ local mru = function(opts)
   end
 
   local results = {}
+  local exists = {}
   local cwd = vim.loop.cwd() .. Path.path.sep
   for _, val in ipairs(utils.max_split(data, '\n')) do
     local p = Path:new(val)
     local lowerPrefix = val:sub(1, #cwd):gsub(Path.path.sep, ''):lower()
     local lowerCWD = cwd:gsub(Path.path.sep, ''):lower()
-    if lowerCWD == lowerPrefix and p:exists() and p:is_file() then
-      results[#results + 1] = val:sub(#cwd + 1)
+    if lowerCWD == lowerPrefix and p:exists() and p:is_file()
+      and exists[val:sub(#cwd + 1)] == nil then
+        exists[val:sub(#cwd + 1)] = true
+        results[#results + 1] = val:sub(#cwd + 1)
     end
   end
 
