@@ -84,10 +84,9 @@ local mru = function(opts)
     local p = Path:new(val)
     local lowerPrefix = val:sub(1, #cwd):gsub(Path.path.sep, ''):lower()
     local lowerCWD = cwd:gsub(Path.path.sep, ''):lower()
-    if lowerCWD == lowerPrefix and p:exists() and p:is_file()
-      and exists[val:sub(#cwd + 1)] == nil then
-        exists[val:sub(#cwd + 1)] = true
-        results[#results + 1] = val:sub(#cwd + 1)
+    if lowerCWD == lowerPrefix and p:exists() and p:is_file() and exists[val:sub(#cwd + 1)] == nil then
+      exists[val:sub(#cwd + 1)] = true
+      results[#results + 1] = val:sub(#cwd + 1)
     end
   end
 
@@ -507,7 +506,7 @@ local diagnostics = function(opts)
     end
   end
 
-  opts.path_display = F.if_nil(opts.path_display, {'hidden'})
+  opts.path_display = F.if_nil(opts.path_display, { 'hidden' })
   pickers.new(opts, {
     prompt_title = 'Coc Diagnostics',
     previewer = conf.qflist_previewer(opts),
@@ -524,7 +523,7 @@ end
 
 local workspace_diagnostics = function(opts)
   opts = F.if_nil(opts, {})
-  opts.path_display = F.if_nil(opts.path_display, {'shorten'})
+  opts.path_display = F.if_nil(opts.path_display, { 'shorten' })
   opts.prompt_title = 'Coc Workspace Diagnostics'
   opts.get_all = true
   diagnostics(opts)
