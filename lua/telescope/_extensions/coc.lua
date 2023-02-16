@@ -480,6 +480,9 @@ local diagnostics = function(opts)
   local buf_names = {}
   local current_buf = api.nvim_get_current_buf()
   local current_filename = api.nvim_buf_get_name(current_buf)
+  if vim.fn.has("win32") then
+    current_filename = string.lower(string.sub(current_filename, 1, 1)) .. string.sub(current_filename, 2)
+  end
   if opts.get_all then
     local bufs = api.nvim_list_bufs()
     for _, bn in ipairs(bufs) do
