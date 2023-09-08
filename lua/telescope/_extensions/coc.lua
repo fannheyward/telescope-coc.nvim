@@ -317,10 +317,10 @@ local references = function(opts)
   end
 
   local displayer = entry_display.create({
-    separator = '▏',
+    separator = '',
     items = {
-      { width = 6 },
-      { width = 40 },
+      { width = 0 },
+      { remaining = true },
       { remaining = true },
     },
   })
