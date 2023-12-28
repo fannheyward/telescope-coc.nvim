@@ -48,10 +48,18 @@ local locations_to_items = function(locs)
       l.range = l.targetRange
     end
     local bufnr = vim.uri_to_bufnr(l.uri)
-    vim.fn.bufload(bufnr)
+    local is_loaded = api.nvim_buf_is_loaded(bufnr)
+    local line = ''
+
+    if not is_loaded then
+      local content = vim.fn.readfile(vim.uri_to_fname(l.uri))
+      line = content[l.range.start.line + 1]
+    else
+      line = (api.nvim_buf_get_lines(bufnr, l.range.start.line, l.range.start.line + 1, false) or { '' })[1]
+    end
+
     local filename = vim.uri_to_fname(l.uri)
     local row = l.range.start.line
-    local line = (api.nvim_buf_get_lines(bufnr, row, row + 1, false) or { '' })[1]
     items[#items + 1] = {
       filename = filename,
       lnum = row + 1,
