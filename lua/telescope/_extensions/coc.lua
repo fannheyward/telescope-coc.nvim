@@ -17,7 +17,6 @@ local jit = jit
 local F = vim.F
 local fn = vim.fn
 local api = vim.api
-local CocAction = fn.CocAction
 local CocActionAsync = fn.CocActionAsync
 
 local config = {}
@@ -126,6 +125,31 @@ local mru = function(opts)
   }):find()
 end
 
+local function CocActionWithTimeout(type, ...)
+  local result = nil
+  local completed = false
+
+  local args = { ... }
+  table.insert(args, 1, type)
+  table.insert(args, function(_, res)
+    result = res
+    completed = true
+  end)
+
+  CocActionAsync(unpack(args))
+
+  local timeout = 3000
+  local waited = vim.wait(timeout, function()
+    return completed
+  end, 50)
+
+  if not waited then
+    print("Timeout waiting for " .. type .. " result (timeout: " .. timeout .. "ms)")
+  end
+
+  return result
+end
+
 local links = function(opts)
   if config.theme then
     opts = vim.tbl_deep_extend("force", opts or {}, config.theme)
@@ -134,7 +158,7 @@ local links = function(opts)
     return
   end
 
-  local res = CocAction('links')
+  local res = CocActionWithTimeout('links')
   if type(res) ~= 'table' then
     return
   end
@@ -189,7 +213,7 @@ local handle_code_actions = function(opts, mode)
     return
   end
 
-  local results = CocAction('codeActions', mode)
+  local results = CocActionWithTimeout('codeActions', mode)
   if type(results) ~= 'table' then
     return
   end
@@ -221,7 +245,7 @@ local handle_code_actions = function(opts, mode)
       actions.select_default:replace(function()
         actions.close(prompt_bufnr)
         local selection = action_state.get_selected_entry()
-        CocAction('doCodeAction', selection.value)
+        CocActionAsync('doCodeAction', selection.value)
       end)
 
       return true
@@ -251,7 +275,7 @@ local function list_or_jump(opts)
     return
   end
 
-  local defs = CocAction(opts.coc_action)
+  local defs = CocActionWithTimeout(opts.coc_action)
   if type(defs) ~= 'table' then
     return
   end
@@ -314,7 +338,7 @@ local references = function(opts)
   end
 
   local excludeDeclaration = opts.excludeDeclaration or false
-  local refs = CocAction('references', excludeDeclaration)
+  local refs = CocActionWithTimeout('references', excludeDeclaration)
   if type(refs) ~= 'table' or vim.tbl_isempty(refs) then
     return
   end
@@ -402,7 +426,7 @@ local document_symbols = function(opts)
   end
 
   local current_buf = api.nvim_get_current_buf()
-  local symbols = CocAction('documentSymbols', current_buf)
+  local symbols = CocActionWithTimeout('documentSymbols', current_buf)
   if type(symbols) ~= 'table' or vim.tbl_isempty(symbols) then
     return
   end
@@ -436,7 +460,7 @@ end
 local function get_workspace_symbols_requester()
   return function(prompt)
     local results = {}
-    local symbols = CocAction('getWorkspaceSymbols', prompt)
+    local symbols = CocActionWithTimeout('getWorkspaceSymbols', prompt)
     if type(symbols) ~= 'table' or vim.tbl_isempty(symbols) then
       return results
     end
@@ -478,7 +502,7 @@ local diagnostics = function(opts)
     return
   end
 
-  local diagnosticsList = CocAction('diagnosticList')
+  local diagnosticsList = CocActionWithTimeout('diagnosticList')
   if type(diagnosticsList) ~= 'table' or vim.tbl_isempty(diagnosticsList) then
     return
   end
@@ -548,7 +572,7 @@ local commands = function(opts)
     return
   end
 
-  local cmds = CocAction('commands')
+  local cmds = CocActionWithTimeout('commands')
   if type(cmds) ~= 'table' or vim.tbl_isempty(cmds) then
     print('No commands available')
     return
