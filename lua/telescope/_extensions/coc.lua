@@ -126,6 +126,7 @@ local mru = function(opts)
         }
       end,
     }),
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -206,6 +207,7 @@ local links = function(opts)
 
       return true
     end,
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -254,6 +256,7 @@ local handle_code_actions = function(opts, mode)
 
       return true
     end,
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -301,6 +304,7 @@ local function list_or_jump(opts)
         results = results,
         entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
       }),
+      push_cursor_on_edit = config.push_cursor_on_edit,
     }):find()
   end
 end
@@ -393,6 +397,7 @@ local references = function(opts)
         }
       end,
     }),
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -418,6 +423,7 @@ local locations = function(opts)
       results = results,
       entry_maker = opts.entry_maker or make_entry.gen_from_quickfix(opts),
     }),
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -458,6 +464,7 @@ local document_symbols = function(opts)
       tag = 'symbol_type',
       sorter = conf.generic_sorter(opts),
     }),
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -495,6 +502,7 @@ local workspace_symbols = function(opts)
     }),
     previewer = conf.qflist_previewer(opts),
     sorter = conf.generic_sorter(),
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -557,6 +565,7 @@ local diagnostics = function(opts)
       tag = 'type',
       sorter = conf.generic_sorter(opts),
     }),
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -651,6 +660,7 @@ local commands = function(opts)
       end)
       return true
     end,
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -679,6 +689,7 @@ local function subcommands(opts)
       end)
       return true
     end,
+    push_cursor_on_edit = config.push_cursor_on_edit,
   }):find()
 end
 
@@ -689,6 +700,9 @@ return require('telescope').register_extension({
     end
     if ext_config.prefer_locations then
       config.prefer_locations = true
+    end
+    if ext_config.push_cursor_on_edit then
+      config.push_cursor_on_edit = true
     end
   end,
   exports = {
