@@ -143,7 +143,7 @@ local function CocActionWithTimeout(type, ...)
 
   CocActionAsync(unpack(args))
 
-  local timeout = 3000
+  local timeout = (config and config.timeout) or 3000
   local waited = vim.wait(timeout, function()
     return completed
   end, 50)
@@ -703,6 +703,9 @@ return require('telescope').register_extension({
     end
     if ext_config.push_cursor_on_edit then
       config.push_cursor_on_edit = true
+    end
+    if ext_config.timeout then
+      config.timeout = ext_config.timeout
     end
   end,
   exports = {
