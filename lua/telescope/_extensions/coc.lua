@@ -453,6 +453,7 @@ local document_symbols = function(opts)
   end
 
   opts.ignore_filename = opts.ignore_filename or true
+  opts.path_display = { "hidden" }
   pickers.new(opts, {
     prompt_title = 'Coc Document Symbols',
     previewer = conf.qflist_previewer(opts),
