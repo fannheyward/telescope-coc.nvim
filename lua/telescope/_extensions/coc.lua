@@ -578,6 +578,64 @@ local workspace_diagnostics = function(opts)
   diagnostics(opts)
 end
 
+local notifications = function(opts)
+  if config.theme then
+    opts = vim.tbl_deep_extend("force", opts or {}, config.theme)
+  end
+  if not is_ready() then
+    return
+  end
+
+  local results = CocActionWithTimeout('notificationHistory')
+  if type(results) ~= 'table' then
+    return
+  end
+
+  local displayer = entry_display.create({
+    separator = ' ',
+    items = {
+      { width = 8 },
+      { width = 10 },
+      { remaining = true },
+    },
+  })
+
+  local make_display = function(entry)
+    return displayer({
+      { entry.kind or 'Info', 'TelescopeResultsFunction' },
+      { entry.time:sub(12, 19), 'TelescopeResultsComment' },
+      entry.message,
+    })
+  end
+
+  pickers.new(opts, {
+    prompt_title = 'Coc Notification History',
+    sorter = conf.generic_sorter(opts),
+    finder = finders.new_table({
+      results = results,
+      entry_maker = function(line)
+        return {
+          valid = line ~= nil,
+          value = line,
+          ordinal = line.time .. ' ' .. line.kind .. ' ' .. line.message,
+          display = make_display,
+          message = line.message,
+          kind = line.kind,
+          time = line.time,
+        }
+      end,
+    }),
+    attach_mappings = function(prompt_bufnr)
+      actions.select_default:replace(function()
+        -- Do nothing on Enter
+        actions.close(prompt_bufnr)
+      end)
+      return true
+    end,
+    push_cursor_on_edit = config.push_cursor_on_edit,
+  }):find()
+end
+
 local commands = function(opts)
   if config.theme then
     opts = vim.tbl_deep_extend("force", opts or {}, config.theme)
@@ -728,6 +786,7 @@ return require('telescope').register_extension({
     document_symbols = document_symbols,
     workspace_symbols = workspace_symbols,
     workspace_diagnostics = workspace_diagnostics,
+    notifications = notifications,
   },
 })
 
